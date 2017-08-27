@@ -1,2 +1,2 @@
 # pythonxr
-some interesting demo
+A game of playing a plane
