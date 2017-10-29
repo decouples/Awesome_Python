@@ -1,4 +1,5 @@
 # python
-      * Game:A game of playing a plane
-      * 列表反转与去重：反转去重
+      Game:A game of playing a plane
+      列表反转与去重：反转去重
+      some examples for MNIST
 `
