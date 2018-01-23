@@ -166,9 +166,9 @@ https://github.com/guodongxiaren/ImageCache/raw/master/Logo/foryou.gif
 
 |#|语法|效果|
 |---|----|:---:|
-|1|`[![weibo-logo]](http://weibo.com/linpiaochen)`|[![weibo-logo]](http://weibo.com/linpiaochen)|
-|2|`[![](/img/zhihu.png "我的知乎，欢迎关注")][zhihu]`|[![](/img/zhihu.png "我的知乎，欢迎关注")][zhihu]|
-|3|`[![csdn-logo]][csdn]`|[![csdn-logo]][csdn]|
+|1|`[![weibo-logo]](http://weibo.com/linpiaochen)`||
+|2|`[![](/img/zhihu.png "我的知乎，欢迎关注")][zhihu]`||
+|3|`[![csdn-logo]][csdn]`||
 
 因为图片本身和链接本身都支持URL标识符的形式，所以图片链接也可以很简洁（见例3）。  
 注意，此时鼠标悬停时显示的文字是图片的title，而非链接本身的title了。
@@ -297,17 +297,7 @@ string &operator+(const string& A,const string& B) //cpp
 | ---- | ---- |
 |![baidu][baidu-logo] | 百度|
 
-表情
-----------
-Github的Markdown语法支持添加emoji表情，输入不同的符号码（两个冒号包围的字符）可以显示出不同的表情。
-
-比如`:blush:`，可以显示:blush:。
-
-具体每一个表情的符号码，可以查询GitHub的官方网页[http://www.emoji-cheat-sheet.com](http://www.emoji-cheat-sheet.com)。
-
-但是这个网页每次都打开**奇慢**。。所以我整理到了本repo中，大家可以直接在此查看[emoji](./emoji.md)。
-
-diff语法
+diff
 ---------
 版本控制的系统中都少不了diff的功能，即展示一个文件内容的增加与删除。
 GFM中可以显示的展示diff效果。使用绿色表示新增，红色表示删除。
@@ -321,11 +311,3 @@ GFM中可以显示的展示diff效果。使用绿色表示新增，红色表示�
 + 鸟宿池边树，僧敲月下门
 - 鸟宿池边树，僧推月下门
 ```
---------------------------------
-[csdn]:http://blog.csdn.net/guodongxiaren "我的博客"
-[zhihu]:https://www.zhihu.com/people/jellywong "我的知乎，欢迎关注"
-[weibo]:http://weibo.com/linpiaochen
-[baidu-logo]:http://www.baidu.com/img/bdlogo.gif "百度logo"
-[weibo-logo]:/img/weibo.png "点击图片进入我的微博"
-[csdn-logo]:/img/csdn.png "我的CSDN博客"
-[foryou]:https://github.com/guodongxiaren/ImageCache/raw/master/Logo/foryou.gif
