@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 # download path: https://huggingface.co/BAAI/bge-reranker-v2-m3
 default_model = "/data1/r1/bge-reranker-v2-m3"
-# 并发数， 按需调整
+# RERANK_MAX_WORKERS
 os.environ["RERANK_MAX_WORKERS"] = "4"
 
 class BGEReranker:
@@ -27,12 +27,10 @@ class BGEReranker:
         self._load_lock = asyncio.Lock()
         self.max_workers = int(os.getenv("RERANK_MAX_WORKERS", "4"))
         self._executor = concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers)
-        # 用于限流单请求内的并发评分任务数量
         self._sem = asyncio.Semaphore(self.max_workers)
         logger.info(f"initialize model use device: {self.device}, max_workers={self.max_workers}")
 
     def _load_model_sync(self):
-        """同步加载，放在线程池内执行"""
         logger.info(f"load model: {self.model_name}")
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.model = AutoModelForSequenceClassification.from_pretrained(
@@ -44,7 +42,6 @@ class BGEReranker:
         logger.info("load complete")
 
     async def load_model(self):
-        """异步加载，带锁防止并发重复加载"""
         if self.model is None:
             async with self._load_lock:
                 if self.model is None:
@@ -55,7 +52,6 @@ class BGEReranker:
                         raise
 
     def _compute_score_sync(self, query: str, passage: str) -> float:
-        """同步推理函数，放在线程池执行，避免阻塞事件循环"""
         try:
             inputs = self.tokenizer(
                 query,
@@ -75,12 +71,10 @@ class BGEReranker:
             return 0.0
 
     async def compute_score(self, query: str, passage: str) -> float:
-        """异步包装：在线程池执行同步推理"""
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(self._executor, self._compute_score_sync, query, passage)
 
     async def rerank_documents(self, query: str, documents: List[str], top_n: int = None, threshold=0.1) -> List[Dict]:
-        """并发重排：对每个文档的打分在线程池并发执行，受信号量限制"""
         if not documents:
             return []
         await self.load_model()
@@ -88,14 +82,12 @@ class BGEReranker:
             async with self._sem:
                 return await self.compute_score(query, doc)
 
-        # 并行计算各文档分数
         tasks = [asyncio.create_task(bound_score(doc)) for doc in documents]
         scores = await asyncio.gather(*tasks, return_exceptions=False)
 
         results = [{"index": idx, "relevance_score": float(score)} for idx, score in enumerate(scores)]
         results.sort(key=lambda x: x["relevance_score"], reverse=True)
         logger.info(f"{[ite['relevance_score'] for ite in results]}")
-        # 按需过滤
         # results = [ite for ite in results if ite['relevance_score'] >= threshold]
         if top_n is not None:
             results = results[:top_n]
